@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>經緯度及方位距離計算器</title>
+  </head>
+  <body>
+    <h1>經緯度及方位距離計算器</h1>
+    <table>
+      <tr>
+        <td>緯度：</td>
+        <td><input type="text" id="lat_deg" size="2">° <input type="text" id="lat_min" size="2">' <input type="text" id="lat_sec" size="2">'' N</td>
+      </tr>
+      <tr>
+        <td>經度：</td>
+        <td><input type="text" id="lon_deg" size="2">° <input type="text" id="lon_min" size="2">' <input type="text" id="lon_sec" size="2">'' E</td>
+      </tr>
+      <tr>
+        <td>方位：</td>
+        <td><input type="text" id="bearing" size="3">°</td>
+      </tr>
+      <tr>
+        <td>距離：</td>
+        <td><input type="text" id="distance" size="10"> km</td>
+      </tr>
+      <tr>
+        <td colspan="2"><button onclick="calculate()">計算</button></td>
+      </tr>
+    </table>
+    <br>
+    <table id="result" border="1">
+      <tr>
+        <th>緯度</th>
+        <th>經度</th>
+      </tr>
+      <tr>
+        <td><input type="text" id="new_lat_deg" size="2">° <input type="text" id="new_lat_min" size="2">' <input type="text" id="new_lat_sec" size="2">'' N</td>
+        <td><input type="text" id="new_lon_deg" size="2">° <input type="text" id="new_lon_min" size="2">' <input type="text" id="new_lon_sec" size="2">'' E</td>
+      </tr>
+    </table>
+<script>
+      function calculate() {
+        var lat_deg = parseFloat(document.getElementById("lat_deg").value);
+        var lat_min = parseFloat(document.getElementById("lat_min").value);
+        var lat_sec = parseFloat(document.getElementById("lat_sec").value);
+        var lon_deg = parseFloat(document.getElementById("lon_deg").value);
+        var lon_min = parseFloat(document.getElementById("lon_min").value);
+        var lon_sec = parseFloat(document.getElementById("lon_sec").value);
+        var bearing = parseFloat(document.getElementById("bearing").value);
+        var distance = parseFloat(document.getElementById("distance").value);
+        var lat = lat_deg + lat_min/60 + lat_sec/3600;
+        var lon = lon_deg + lon_min/60 + lon_sec/3600;
+        var lat_r = lat * Math.PI/180;
+        var lon_r = lon * Math.PI/180;
+        var bearing_r = bearing * Math.PI/180;
+        var distance_r = distance / 6371; // 6371 is the radius of the Earth in km
+        var new_lat_r = Math.asin(Math.sin(lat_r) * Math.cos(distance_r) + Math.cos(lat_r) * Math.sin(distance_r) * Math.cos(bearing_r));
+        var new_lon_r = lon_r + Math.atan2(Math.sin(bearing_r) * Math.sin(distance_r) * Math.cos(lat_r), Math.cos(distance_r) - Math.sin(lat_r) * Math.sin(new_lat_r));
+        var new_lat = new_lat_r * 180/Math.PI;
+        var new_lon = new_lon_r * 180/Math.PI;
+        var new_lat_deg = Math.floor(new_lat);
+        var new_lat_min = Math.floor((new_lat - new_lat_deg) * 60);
+        var new_lat_sec = ((new_lat - new_lat_deg) * 60 - new_lat_min) * 60;
+        var new_lon_deg = Math.floor(new_lon);
+        var new_lon_min = Math.floor((new_lon - new_lon_deg) * 60);
+        var new_lon_sec = ((new_lon - new_lon_deg) * 60 - new_lon_min) * 60;
+        document.getElementById("new_lat_deg").value = new_lat_deg;
+        document.getElementById("new_lat_min").value = new_lat_min;
+        document.getElementById("new_lat_sec").value = new_lat_sec.toFixed(2);
+        document.getElementById("new_lon_deg").value = new_lon_deg;
+        document.getElementById("new_lon_min").value = new_lon_min;
+        document.getElementById("new_lon_sec").value = new_lon_sec.toFixed(2);
+        var table = document.getElementById("result");
+        var row = table.insertRow(-1);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        cell1.innerHTML = new_lat_deg + "° " + new_lat_min + "' " + new_lat_sec.toFixed(2) + "'' N";
+        cell2.innerHTML = new_lon_deg + "° " + new_lon_min + "' " + new_lon_sec.toFixed(2) + "'' E";
+        if (table.rows.length > 20) {
+          table.deleteRow(1);
+        }
+      }
+    </script>
+  </body>
+</html>
+
